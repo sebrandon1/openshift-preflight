@@ -8,6 +8,7 @@ import (
 	"github.com/redhat-openshift-ecosystem/openshift-preflight/certification/formatters"
 	"github.com/redhat-openshift-ecosystem/openshift-preflight/certification/policy"
 	"github.com/redhat-openshift-ecosystem/openshift-preflight/certification/runtime"
+	"github.com/redhat-openshift-ecosystem/openshift-preflight/lib"
 
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
@@ -128,18 +129,18 @@ var _ = Describe("Check Operator", func() {
 		Context("with a valid policy formatter", func() {
 			It("should return with no error, and the appropriate formatter", func() {
 				cfg.ResponseFormat = "xml"
-				runner, err := newCheckOperatorRunner(context.TODO(), cfg)
+				runner, err := lib.NewCheckOperatorRunner(context.TODO(), cfg)
 				Expect(err).ToNot(HaveOccurred())
 				expectedFormatter, err := formatters.NewByName(cfg.ResponseFormat)
 				Expect(err).ToNot(HaveOccurred())
-				Expect(runner.formatter.PrettyName()).To(Equal(expectedFormatter.PrettyName()))
+				Expect(runner.Formatter.PrettyName()).To(Equal(expectedFormatter.PrettyName()))
 			})
 		})
 
 		Context("with an invalid policy formatter", func() {
 			It("should return an error", func() {
 				cfg.ResponseFormat = "foo"
-				_, err := newCheckOperatorRunner(context.TODO(), cfg)
+				_, err := lib.NewCheckOperatorRunner(context.TODO(), cfg)
 				Expect(err).To(HaveOccurred())
 			})
 		})
@@ -148,12 +149,12 @@ var _ = Describe("Check Operator", func() {
 			It("should return the container policy engine anyway", func() {
 				cfg.Policy = "badpolicy"
 				beforeCfg := *cfg
-				runner, err := newCheckOperatorRunner(context.TODO(), cfg)
+				runner, err := lib.NewCheckOperatorRunner(context.TODO(), cfg)
 				Expect(err).ToNot(HaveOccurred())
 
 				_, err = engine.NewForConfig(context.TODO(), cfg.ReadOnly())
-				Expect(runner.cfg.Policy).ToNot(Equal(beforeCfg.Policy))
-				Expect(runner.cfg.Policy).To(Equal(policy.PolicyOperator))
+				Expect(runner.Cfg.Policy).ToNot(Equal(beforeCfg.Policy))
+				Expect(runner.Cfg.Policy).To(Equal(policy.PolicyOperator))
 				Expect(err).ToNot(HaveOccurred())
 			})
 		})
@@ -161,15 +162,15 @@ var _ = Describe("Check Operator", func() {
 		Context("with an invalid formatter definition", func() {
 			It("should return an error", func() {
 				cfg.ResponseFormat = "foo"
-				_, err := newCheckOperatorRunner(context.TODO(), cfg)
+				_, err := lib.NewCheckOperatorRunner(context.TODO(), cfg)
 				Expect(err).To(HaveOccurred())
 			})
 		})
 
 		It("should contain a ResultWriterFile resultWriter", func() {
-			runner, err := newCheckOperatorRunner(context.TODO(), cfg)
+			runner, err := lib.NewCheckOperatorRunner(context.TODO(), cfg)
 			Expect(err).ToNot(HaveOccurred())
-			_, rwIsExpectedType := runner.rw.(*runtime.ResultWriterFile)
+			_, rwIsExpectedType := runner.Rw.(*runtime.ResultWriterFile)
 			Expect(rwIsExpectedType).To(BeTrue())
 		})
 	})

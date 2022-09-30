@@ -7,6 +7,7 @@ import (
 
 	"github.com/redhat-openshift-ecosystem/openshift-preflight/certification/artifacts"
 	"github.com/redhat-openshift-ecosystem/openshift-preflight/certification/runtime"
+	"github.com/redhat-openshift-ecosystem/openshift-preflight/lib"
 
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
@@ -46,7 +47,7 @@ var _ = Describe("cmd package check command", func() {
 		Context("Regular Connect URL", func() {
 			It("should return a URL with just a project ID", func() {
 				expected := "https://connect.redhat.com/projects/this-is-my-project-id"
-				actual := buildConnectURL(projectID)
+				actual := lib.BuildConnectURL(projectID)
 				Expect(expected).To(Equal(actual))
 			})
 		})
@@ -56,7 +57,7 @@ var _ = Describe("cmd package check command", func() {
 			})
 			It("should return a URL for QA", func() {
 				expected := "https://connect.qa.redhat.com/projects/this-is-my-project-id"
-				actual := buildConnectURL(projectID)
+				actual := lib.BuildConnectURL(projectID)
 				Expect(expected).To(Equal(actual))
 			})
 		})
@@ -66,7 +67,7 @@ var _ = Describe("cmd package check command", func() {
 			})
 			It("should return a URL for UAT", func() {
 				expected := "https://connect.uat.redhat.com/projects/this-is-my-project-id/images/my-image-id/scan-results"
-				actual := buildScanResultsURL(projectID, imageID)
+				actual := lib.BuildScanResultsURL(projectID, imageID)
 				Expect(expected).To(Equal(actual))
 			})
 		})
@@ -76,7 +77,7 @@ var _ = Describe("cmd package check command", func() {
 			})
 			It("should return a URL for QA", func() {
 				expected := "https://connect.qa.redhat.com/projects/this-is-my-project-id/overview"
-				actual := buildOverviewURL(projectID)
+				actual := lib.BuildOverviewURL(projectID)
 				Expect(expected).To(Equal(actual))
 			})
 		})
@@ -86,12 +87,12 @@ var _ = Describe("cmd package check command", func() {
 			})
 			It("should return a Prod overview URL", func() {
 				expected := "https://connect.redhat.com/projects/this-is-my-project-id/overview"
-				actual := buildOverviewURL(projectID)
+				actual := lib.BuildOverviewURL(projectID)
 				Expect(expected).To(Equal(actual))
 			})
 			It("should return a Prod scan URL", func() {
 				expected := "https://connect.redhat.com/projects/this-is-my-project-id/images/my-image-id/scan-results"
-				actual := buildScanResultsURL(projectID, imageID)
+				actual := lib.BuildScanResultsURL(projectID, imageID)
 				Expect(expected).To(Equal(actual))
 			})
 		})
