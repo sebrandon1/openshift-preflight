@@ -9,6 +9,7 @@ import (
 	"github.com/redhat-openshift-ecosystem/openshift-preflight/certification/engine"
 	"github.com/redhat-openshift-ecosystem/openshift-preflight/certification/formatters"
 	"github.com/redhat-openshift-ecosystem/openshift-preflight/certification/runtime"
+	"github.com/redhat-openshift-ecosystem/openshift-preflight/lib"
 
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
@@ -23,11 +24,11 @@ var _ = Describe("Preflight Check Func", func() {
 		var localArtifactsDir string
 
 		var cfg *runtime.Config
-		var pc pyxisClient
+		var pc lib.PyxisClient
 		var eng engine.CheckEngine
 		var fmttr formatters.ResponseFormatter
-		var rw resultWriter
-		var rs resultSubmitter
+		var rw lib.ResultWriter
+		var rs lib.ResultSubmitter
 
 		BeforeEach(func() {
 			// instantiate err to make sure we can equal-assign in the following line.
@@ -58,7 +59,7 @@ var _ = Describe("Preflight Check Func", func() {
 
 			fmttr, _ = formatters.NewByName(formatters.DefaultFormat)
 			rw = &runtime.ResultWriterFile{}
-			rs = &noopSubmitter{}
+			rs = lib.NewNoopSubmitter(false, "", nil)
 
 			DeferCleanup(os.RemoveAll, localTempDir)
 			DeferCleanup(os.RemoveAll, localArtifactsDir)

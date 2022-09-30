@@ -1,4 +1,4 @@
-package cmd
+package lib
 
 import (
 	"context"
@@ -13,23 +13,24 @@ import (
 	"github.com/redhat-openshift-ecosystem/openshift-preflight/certification"
 	"github.com/redhat-openshift-ecosystem/openshift-preflight/certification/artifacts"
 	"github.com/redhat-openshift-ecosystem/openshift-preflight/certification/pyxis"
+	"github.com/spf13/viper"
 
 	log "github.com/sirupsen/logrus"
 )
 
 // resultWriter defines methods associated with writing check results.
-type resultWriter interface {
+type ResultWriter interface {
 	OpenFile(name string) (io.WriteCloser, error)
 	io.WriteCloser
 }
 
 // resultSubmitter defines methods associated with submitting results to Red HAt.
-type resultSubmitter interface {
+type ResultSubmitter interface {
 	Submit(context.Context) error
 }
 
 // pyxisClient defines pyxis API interactions that are relevant to check executions in cmd.
-type pyxisClient interface {
+type PyxisClient interface {
 	FindImagesByDigest(ctx context.Context, digests []string) ([]pyxis.CertImage, error)
 	GetProject(context.Context) (*pyxis.CertProject, error)
 	SubmitResults(context.Context, *pyxis.CertificationInput) (*pyxis.CertificationResults, error)
@@ -40,7 +41,7 @@ type pyxisClient interface {
 // Callers should treat a nil pyxis client as an indicator that pyxis calls should not be made.
 //
 //nolint:unparam // ctx is unused. Keep for future use.
-func newPyxisClient(ctx context.Context, cfg certification.Config) pyxisClient {
+func NewPyxisClient(ctx context.Context, cfg certification.Config) PyxisClient {
 	if cfg.CertificationProjectID() == "" || cfg.PyxisAPIToken() == "" || cfg.PyxisHost() == "" {
 		return nil
 	}
@@ -53,20 +54,20 @@ func newPyxisClient(ctx context.Context, cfg certification.Config) pyxisClient {
 	)
 }
 
-// containerCertificationSubmitter submits container results to Pyxis, and implements
+// ContainerCertificationSubmitter submits container results to Pyxis, and implements
 // a resultSubmitter.
-type containerCertificationSubmitter struct {
-	certificationProjectID string
-	pyxis                  pyxisClient
-	dockerConfig           string
-	preflightLogFile       string
+type ContainerCertificationSubmitter struct {
+	CertificationProjectID string
+	Pyxis                  PyxisClient
+	DockerConfig           string
+	PreflightLogFile       string
 }
 
-func (s *containerCertificationSubmitter) Submit(ctx context.Context) error {
+func (s *ContainerCertificationSubmitter) Submit(ctx context.Context) error {
 	log.Info("preparing results that will be submitted to Red Hat")
 
 	// get the project info from pyxis
-	certProject, err := s.pyxis.GetProject(ctx)
+	certProject, err := s.Pyxis.GetProject(ctx)
 	if err != nil {
 		return fmt.Errorf("could not retrieve project: %w", err)
 	}
@@ -83,11 +84,11 @@ func (s *containerCertificationSubmitter) Submit(ctx context.Context) error {
 
 	// only read the dockerfile if the user provides a location for the file
 	// at this point in the flow, if `cfg.DockerConfig` is empty we know the repo is public and can continue the submission flow
-	if s.dockerConfig != "" {
-		dockerConfigJSONBytes, err := os.ReadFile(s.dockerConfig)
+	if s.DockerConfig != "" {
+		dockerConfigJSONBytes, err := os.ReadFile(s.DockerConfig)
 		if err != nil {
 			return fmt.Errorf("could not open file for submission: %s: %w",
-				s.dockerConfig,
+				s.DockerConfig,
 				err,
 			)
 		}
@@ -100,7 +101,7 @@ func (s *containerCertificationSubmitter) Submit(ctx context.Context) error {
 	// if we were to send what pyixs just sent us in a update call, pyxis would throw a validation error saying it's not valid json
 	// the below code aims to set the DockerConfigJSON to an empty string, and since this field is `omitempty` when we marshall it
 	// we will not get a validation error
-	if s.dockerConfig == "" {
+	if s.DockerConfig == "" {
 		certProject.Container.DockerConfigJSON = ""
 	}
 
@@ -137,11 +138,11 @@ func (s *containerCertificationSubmitter) Submit(ctx context.Context) error {
 	}
 	defer rpmManifest.Close()
 
-	logfile, err := os.Open(s.preflightLogFile)
+	logfile, err := os.Open(s.PreflightLogFile)
 	if err != nil {
 		return fmt.Errorf(
 			"could not open file for submission: %s: %w",
-			s.preflightLogFile,
+			s.PreflightLogFile,
 			err,
 		)
 	}
@@ -155,14 +156,14 @@ func (s *containerCertificationSubmitter) Submit(ctx context.Context) error {
 		// The certification engine writes the rpmManifest for images not based on scratch.
 		WithRPMManifest(rpmManifest).
 		// Include the preflight execution log file.
-		WithArtifact(logfile, filepath.Base(s.preflightLogFile))
+		WithArtifact(logfile, filepath.Base(s.PreflightLogFile))
 
 	input, err := submission.Finalize()
 	if err != nil {
 		return fmt.Errorf("unable to finalize data that would be sent to pyxis: %w", err)
 	}
 
-	certResults, err := s.pyxis.SubmitResults(ctx, input)
+	certResults, err := s.Pyxis.SubmitResults(ctx, input)
 	if err != nil {
 		return fmt.Errorf("could not submit to pyxis: %w", err)
 	}
@@ -170,23 +171,31 @@ func (s *containerCertificationSubmitter) Submit(ctx context.Context) error {
 	log.Info("Test results have been submitted to Red Hat.")
 	log.Info("These results will be reviewed by Red Hat for final certification.")
 	log.Infof("The container's image id is: %s.", certResults.CertImage.ID)
-	log.Infof("Please check %s to view scan results.", buildScanResultsURL(s.certificationProjectID, certResults.CertImage.ID))
-	log.Infof("Please check %s to monitor the progress.", buildOverviewURL(s.certificationProjectID))
+	log.Infof("Please check %s to view scan results.", BuildScanResultsURL(s.CertificationProjectID, certResults.CertImage.ID))
+	log.Infof("Please check %s to monitor the progress.", BuildOverviewURL(s.CertificationProjectID))
 
 	return nil
 }
 
 // noopSubmitter is a no-op resultSubmitter that optionally logs a message
 // and a reason as to why results were not submitted.
-type noopSubmitter struct {
+type NoopSubmitter struct {
 	emitLog bool
 	reason  string
 	log     *log.Logger
 }
 
-var _ resultSubmitter = &noopSubmitter{}
+func NewNoopSubmitter(emitLog bool, reason string, log *log.Logger) *NoopSubmitter {
+	return &NoopSubmitter{
+		emitLog: emitLog,
+		reason:  reason,
+		log:     log,
+	}
+}
 
-func (s *noopSubmitter) Submit(ctx context.Context) error {
+var _ ResultSubmitter = &NoopSubmitter{}
+
+func (s *NoopSubmitter) Submit(ctx context.Context) error {
 	if s.emitLog {
 		msg := "Results are not being sent for submission."
 		if s.reason != "" {
@@ -197,4 +206,31 @@ func (s *noopSubmitter) Submit(ctx context.Context) error {
 	}
 
 	return nil
+}
+
+func (s *NoopSubmitter) SetEmitLog(emitLog bool) {
+	s.emitLog = emitLog
+}
+
+func (s *NoopSubmitter) SetReason(reason string) {
+	s.reason = reason
+}
+
+func buildConnectURL(projectID string) string {
+	connectURL := fmt.Sprintf("https://connect.redhat.com/projects/%s", projectID)
+
+	pyxisEnv := viper.GetString("pyxis_env")
+	if len(pyxisEnv) > 0 && pyxisEnv != "prod" {
+		connectURL = fmt.Sprintf("https://connect.%s.redhat.com/projects/%s", viper.GetString("pyxis_env"), projectID)
+	}
+
+	return connectURL
+}
+
+func BuildOverviewURL(projectID string) string {
+	return fmt.Sprintf("%s/overview", buildConnectURL(projectID))
+}
+
+func BuildScanResultsURL(projectID string, imageID string) string {
+	return fmt.Sprintf("%s/images/%s/scan-results", buildConnectURL(projectID), imageID)
 }

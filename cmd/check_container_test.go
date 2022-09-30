@@ -16,6 +16,7 @@ import (
 	"github.com/redhat-openshift-ecosystem/openshift-preflight/certification/policy"
 	"github.com/redhat-openshift-ecosystem/openshift-preflight/certification/pyxis"
 	"github.com/redhat-openshift-ecosystem/openshift-preflight/certification/runtime"
+	"github.com/redhat-openshift-ecosystem/openshift-preflight/lib"
 
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
@@ -50,34 +51,34 @@ var _ = Describe("Check Container Command", func() {
 
 		It("should throw an error if unable to get the project from the API", func() {
 			fakePC.getProjectsFunc = gpFuncReturnError
-			_, err := getContainerPolicyExceptions(context.TODO(), fakePC)
+			_, err := lib.GetContainerPolicyExceptions(context.TODO(), fakePC)
 			Expect(err).To(HaveOccurred())
 		})
 
 		It("should return a scratch policy exception if the project has the flag in the API", func() {
 			fakePC.getProjectsFunc = gpFuncReturnScratchException
-			p, err := getContainerPolicyExceptions(context.TODO(), fakePC)
+			p, err := lib.GetContainerPolicyExceptions(context.TODO(), fakePC)
 			Expect(p).To(Equal(policy.PolicyScratch))
 			Expect(err).ToNot(HaveOccurred())
 		})
 
 		It("should return a root policy exception if the project has the flag in the API", func() {
 			fakePC.getProjectsFunc = gpFuncReturnRootException
-			p, err := getContainerPolicyExceptions(context.TODO(), fakePC)
+			p, err := lib.GetContainerPolicyExceptions(context.TODO(), fakePC)
 			Expect(p).To(Equal(policy.PolicyRoot))
 			Expect(err).ToNot(HaveOccurred())
 		})
 
 		It("should return a container policy exception if the project no exceptions in the API", func() {
 			fakePC.getProjectsFunc = gpFuncReturnNoException
-			p, err := getContainerPolicyExceptions(context.TODO(), fakePC)
+			p, err := lib.GetContainerPolicyExceptions(context.TODO(), fakePC)
 			Expect(p).To(Equal(policy.PolicyContainer))
 			Expect(err).ToNot(HaveOccurred())
 		})
 	})
 
 	Context("When using the containerCertificationSubmitter", func() {
-		var sbmt *containerCertificationSubmitter
+		var sbmt *lib.ContainerCertificationSubmitter
 		var fakePC *fakePyxisClient
 		var dockerConfigPath string
 		var preflightLogPath string
@@ -99,11 +100,11 @@ var _ = Describe("Check Container Command", func() {
 			fakePC.setGPFuncReturnBaseProject("")
 
 			// configure the submitter
-			sbmt = &containerCertificationSubmitter{
-				certificationProjectID: fakePC.baseProject("").ID,
-				pyxis:                  fakePC,
-				dockerConfig:           dockerConfigPath,
-				preflightLogFile:       preflightLogPath,
+			sbmt = &lib.ContainerCertificationSubmitter{
+				CertificationProjectID: fakePC.baseProject("").ID,
+				Pyxis:                  fakePC,
+				DockerConfig:           dockerConfigPath,
+				PreflightLogFile:       preflightLogPath,
 			}
 
 			certImageJSONBytes, err := json.Marshal(pyxis.CertImage{
@@ -159,7 +160,7 @@ var _ = Describe("Check Container Command", func() {
 				fakePC.setSRFuncSubmitSuccessfully("", "")
 			})
 			It("should not throw an error", func() {
-				sbmt.dockerConfig = ""
+				sbmt.DockerConfig = ""
 				err := os.Remove(dockerConfigPath)
 				Expect(err).ToNot(HaveOccurred())
 
@@ -261,24 +262,24 @@ var _ = Describe("Check Container Command", func() {
 
 	Context("When using the noop submitter", func() {
 		var bf *bytes.Buffer
-		var noop *noopSubmitter
+		var noop *lib.NoopSubmitter
 
 		BeforeEach(func() {
 			bufferLogger := logrus.New()
 			bf = bytes.NewBuffer([]byte{})
 			bufferLogger.SetOutput(bf)
 
-			noop = &noopSubmitter{log: bufferLogger}
+			noop = lib.NewNoopSubmitter(false, "", bufferLogger)
 		})
 
 		Context("and enabling log emitting", func() {
 			BeforeEach(func() {
-				noop.emitLog = true
+				noop.SetEmitLog(true)
 			})
 
 			It("should include the reason in the emitted log if specified", func() {
 				testReason := "test reason"
-				noop.reason = testReason
+				noop.SetReason(testReason)
 				err := noop.Submit(context.TODO())
 				Expect(err).ToNot(HaveOccurred())
 				Expect(bf.String()).To(ContainSubstring(testReason))
@@ -293,7 +294,7 @@ var _ = Describe("Check Container Command", func() {
 
 		Context("and disabling log emitting", func() {
 			It("should not emit logs when calling submit", func() {
-				noop.emitLog = false
+				noop.SetEmitLog(false)
 				err := noop.Submit(context.TODO())
 				Expect(err).ToNot(HaveOccurred())
 				Expect(bf.String()).To(BeEmpty())
@@ -311,12 +312,12 @@ var _ = Describe("Check Container Command", func() {
 				LogFile:                "logfile",
 			}
 
-			pc := newPyxisClient(context.TODO(), cfg.ReadOnly())
+			pc := lib.NewPyxisClient(context.TODO(), cfg.ReadOnly())
 			Expect(pc).ToNot(BeNil())
 
 			It("should return a containerCertificationSubmitter", func() {
-				submitter := resolveSubmitter(pc, cfg.ReadOnly())
-				typed, ok := submitter.(*containerCertificationSubmitter)
+				submitter := lib.ResolveSubmitter(pc, cfg.ReadOnly())
+				typed, ok := submitter.(*lib.ContainerCertificationSubmitter)
 				Expect(typed).ToNot(BeNil())
 				Expect(ok).To(BeTrue())
 			})
@@ -325,8 +326,8 @@ var _ = Describe("Check Container Command", func() {
 		Context("With no pyxis client", func() {
 			cfg := runtime.Config{}
 			It("should return a no-op submitter", func() {
-				submitter := resolveSubmitter(nil, cfg.ReadOnly())
-				typed, ok := submitter.(*noopSubmitter)
+				submitter := lib.ResolveSubmitter(nil, cfg.ReadOnly())
+				typed, ok := submitter.(*lib.NoopSubmitter)
 				Expect(typed).ToNot(BeNil())
 				Expect(ok).To(BeTrue())
 			})
@@ -338,7 +339,7 @@ var _ = Describe("Check Container Command", func() {
 			cfgNoCertProjectID := runtime.Config{}
 
 			It("Should return a nil pyxis client", func() {
-				pc := newPyxisClient(context.TODO(), cfgNoCertProjectID.ReadOnly())
+				pc := lib.NewPyxisClient(context.TODO(), cfgNoCertProjectID.ReadOnly())
 				Expect(pc).To(BeNil())
 			})
 		})
@@ -360,13 +361,13 @@ var _ = Describe("Check Container Command", func() {
 			}
 
 			It("Should return a nil pyxis client", func() {
-				pc := newPyxisClient(context.TODO(), cfgMissingCertProjectID.ReadOnly())
+				pc := lib.NewPyxisClient(context.TODO(), cfgMissingCertProjectID.ReadOnly())
 				Expect(pc).To(BeNil())
 
-				pc = newPyxisClient(context.TODO(), cfgMissingPyxisHost.ReadOnly())
+				pc = lib.NewPyxisClient(context.TODO(), cfgMissingPyxisHost.ReadOnly())
 				Expect(pc).To(BeNil())
 
-				pc = newPyxisClient(context.TODO(), cfgMissingPyxisAPIToken.ReadOnly())
+				pc = lib.NewPyxisClient(context.TODO(), cfgMissingPyxisAPIToken.ReadOnly())
 				Expect(pc).To(BeNil())
 			})
 		})
@@ -379,7 +380,7 @@ var _ = Describe("Check Container Command", func() {
 			}
 
 			It("should return a pyxis client", func() {
-				pc := newPyxisClient(context.TODO(), cfgValid.ReadOnly())
+				pc := lib.NewPyxisClient(context.TODO(), cfgValid.ReadOnly())
 				Expect(pc).ToNot(BeNil())
 			})
 		})
@@ -397,9 +398,9 @@ var _ = Describe("Check Container Command", func() {
 
 		Context("and the user passed the submit flag, but no credentials", func() {
 			It("should return a noop submitter as credentials are required for submission", func() {
-				runner, err := newCheckContainerRunner(context.TODO(), cfg)
+				runner, err := lib.NewCheckContainerRunner(context.TODO(), cfg, false)
 				Expect(err).ToNot(HaveOccurred())
-				_, rsIsCorrectType := runner.rs.(*noopSubmitter)
+				_, rsIsCorrectType := runner.Rs.(*lib.NoopSubmitter)
 				Expect(rsIsCorrectType).To(BeTrue())
 			})
 		})
@@ -415,9 +416,9 @@ var _ = Describe("Check Container Command", func() {
 				submit = origSubmitValue
 			})
 			It("should return a noopSubmitter resultSubmitter", func() {
-				runner, err := newCheckContainerRunner(context.TODO(), cfg)
+				runner, err := lib.NewCheckContainerRunner(context.TODO(), cfg, false)
 				Expect(err).ToNot(HaveOccurred())
-				_, rsIsCorrectType := runner.rs.(*noopSubmitter)
+				_, rsIsCorrectType := runner.Rs.(*lib.NoopSubmitter)
 				Expect(rsIsCorrectType).To(BeTrue())
 			})
 		})
@@ -425,21 +426,21 @@ var _ = Describe("Check Container Command", func() {
 		Context("with a valid policy formatter", func() {
 			It("should return with no error, and the appropriate formatter", func() {
 				cfg.ResponseFormat = "xml"
-				runner, err := newCheckContainerRunner(context.TODO(), cfg)
+				runner, err := lib.NewCheckContainerRunner(context.TODO(), cfg, false)
 				Expect(err).ToNot(HaveOccurred())
 				expectedFormatter, err := formatters.NewByName(cfg.ResponseFormat)
 				Expect(err).ToNot(HaveOccurred())
-				Expect(runner.formatter.PrettyName()).To(Equal(expectedFormatter.PrettyName()))
+				Expect(runner.Formatter.PrettyName()).To(Equal(expectedFormatter.PrettyName()))
 			})
 		})
 
 		Context("with an invalid policy definition", func() {
 			It("should return the container policy engine anyway", func() {
-				runner, err := newCheckContainerRunner(context.TODO(), cfg)
+				runner, err := lib.NewCheckContainerRunner(context.TODO(), cfg, false)
 				Expect(err).ToNot(HaveOccurred())
 
 				expectedEngine, err := engine.NewForConfig(context.TODO(), cfg.ReadOnly())
-				Expect(runner.eng).To(BeEquivalentTo(expectedEngine))
+				Expect(runner.Eng).To(BeEquivalentTo(expectedEngine))
 				Expect(err).ToNot(HaveOccurred())
 			})
 		})
@@ -449,15 +450,15 @@ var _ = Describe("Check Container Command", func() {
 		Context("with an invalid formatter definition", func() {
 			It("should return an error", func() {
 				cfg.ResponseFormat = "foo"
-				_, err := newCheckContainerRunner(context.TODO(), cfg)
+				_, err := lib.NewCheckContainerRunner(context.TODO(), cfg, false)
 				Expect(err).To(HaveOccurred())
 			})
 		})
 
 		It("should contain a ResultWriterFile resultWriter", func() {
-			runner, err := newCheckContainerRunner(context.TODO(), cfg)
+			runner, err := lib.NewCheckContainerRunner(context.TODO(), cfg, false)
 			Expect(err).ToNot(HaveOccurred())
-			_, rwIsExpectedType := runner.rw.(*runtime.ResultWriterFile)
+			_, rwIsExpectedType := runner.Rw.(*runtime.ResultWriterFile)
 			Expect(rwIsExpectedType).To(BeTrue())
 		})
 	})
