@@ -1,15 +1,13 @@
 package cmd
 
 import (
-	"context"
 	"fmt"
 	"os"
 
-	"github.com/redhat-openshift-ecosystem/openshift-preflight/certification/engine"
-	"github.com/redhat-openshift-ecosystem/openshift-preflight/certification/formatters"
-	"github.com/redhat-openshift-ecosystem/openshift-preflight/certification/policy"
-	"github.com/redhat-openshift-ecosystem/openshift-preflight/certification/runtime"
-	"github.com/redhat-openshift-ecosystem/openshift-preflight/version"
+	"github.com/sebrandon1/openshift-preflight/certification/formatters"
+	"github.com/sebrandon1/openshift-preflight/certification/runtime"
+	"github.com/sebrandon1/openshift-preflight/lib"
+	"github.com/sebrandon1/openshift-preflight/version"
 
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
@@ -48,38 +46,6 @@ func checkOperatorCmd() *cobra.Command {
 	return checkOperatorCmd
 }
 
-// checkOperatorRunner contains all of the components necessary to run checkOperator.
-type checkOperatorRunner struct {
-	cfg       *runtime.Config
-	eng       engine.CheckEngine
-	formatter formatters.ResponseFormatter
-	rw        resultWriter
-}
-
-// newCheckOperatorRunner returns a checkOperatorRunner containing all of the tooling necessary
-// to run checkOperator.
-func newCheckOperatorRunner(ctx context.Context, cfg *runtime.Config) (*checkOperatorRunner, error) {
-	cfg.Policy = policy.PolicyOperator
-	cfg.Submit = false // there's no such thing as submitting for operators today.
-
-	engine, err := engine.NewForConfig(ctx, cfg.ReadOnly())
-	if err != nil {
-		return nil, err
-	}
-
-	fmttr, err := formatters.NewForConfig(cfg.ReadOnly())
-	if err != nil {
-		return nil, err
-	}
-
-	return &checkOperatorRunner{
-		cfg:       cfg,
-		eng:       engine,
-		formatter: fmttr,
-		rw:        &runtime.ResultWriterFile{},
-	}, nil
-}
-
 // ensureKubeconfigIsSet ensures that the KUBECONFIG environment variable has a value.
 func ensureKubeconfigIsSet() error {
 	if _, ok := os.LookupEnv("KUBECONFIG"); !ok {
@@ -116,7 +82,7 @@ func checkOperatorRunE(cmd *cobra.Command, args []string) error {
 	cfg.Bundle = true
 	cfg.Scratch = true
 
-	checkOperator, err := newCheckOperatorRunner(ctx, cfg)
+	checkOperator, err := lib.NewCheckOperatorRunner(ctx, cfg)
 	if err != nil {
 		return err
 	}
@@ -124,12 +90,12 @@ func checkOperatorRunE(cmd *cobra.Command, args []string) error {
 	// Run the operator check
 	cmd.SilenceUsage = true
 	return preflightCheck(ctx,
-		checkOperator.cfg,
+		checkOperator.Cfg,
 		nil, // no pyxisClient is necessary
-		checkOperator.eng,
-		checkOperator.formatter,
-		checkOperator.rw,
-		&noopSubmitter{}, // we do not submit these results.
+		checkOperator.Eng,
+		checkOperator.Formatter,
+		checkOperator.Rw,
+		&lib.NoopSubmitter{}, // we do not submit these results.
 	)
 }
 

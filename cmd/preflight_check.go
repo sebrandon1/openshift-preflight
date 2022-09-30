@@ -7,10 +7,11 @@ import (
 	"os"
 	"strings"
 
-	"github.com/redhat-openshift-ecosystem/openshift-preflight/certification/artifacts"
-	"github.com/redhat-openshift-ecosystem/openshift-preflight/certification/engine"
-	"github.com/redhat-openshift-ecosystem/openshift-preflight/certification/formatters"
-	"github.com/redhat-openshift-ecosystem/openshift-preflight/certification/runtime"
+	"github.com/sebrandon1/openshift-preflight/certification/artifacts"
+	"github.com/sebrandon1/openshift-preflight/certification/engine"
+	"github.com/sebrandon1/openshift-preflight/certification/formatters"
+	"github.com/sebrandon1/openshift-preflight/certification/runtime"
+	"github.com/sebrandon1/openshift-preflight/lib"
 
 	log "github.com/sirupsen/logrus"
 )
@@ -19,11 +20,11 @@ import (
 func preflightCheck(
 	ctx context.Context,
 	cfg *runtime.Config,
-	pc pyxisClient, //nolint:unparam // pyxisClient is currently unused.
+	pc lib.PyxisClient, //nolint:unparam // pyxisClient is currently unused.
 	eng engine.CheckEngine,
 	formatter formatters.ResponseFormatter,
-	rw resultWriter,
-	rs resultSubmitter,
+	rw lib.ResultWriter,
+	rs lib.ResultSubmitter,
 ) error {
 	// configure the artifacts directory if the user requested a different directory.
 	if cfg.Artifacts != "" {
