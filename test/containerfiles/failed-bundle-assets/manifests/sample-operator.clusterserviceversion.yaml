@@ -178,5 +178,5 @@ spec:
   maturity: alpha
   provider:
     name: The Preflighters
-    url: https://github.com/redhat-openshift-ecosystem/openshift-preflight
+    url: https://github.com/sebrandon1/openshift-preflight
   version: 0.0.1

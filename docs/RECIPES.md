@@ -142,7 +142,7 @@ oc apply -f preflight.yaml
 ## Container Policy
 These examples are shown using the Container policy against a container image
 (e.g. `preflight check container <image>`). Container policy only runs as a binary on your workstation. Check the latest
-[release](https://github.com/redhat-openshift-ecosystem/openshift-preflight/releases) for the binary that matches your operating system.
+[release](https://github.com/sebrandon1/openshift-preflight/releases) for the binary that matches your operating system.
 
 You will also need:
 - Your container image published to a container registry

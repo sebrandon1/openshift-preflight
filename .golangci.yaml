@@ -44,7 +44,7 @@ linters-settings:
       - github.com/onsi/ginkgo
       - github.com/onsi/ginkgo/v2
   goimports:
-    local-prefixes: github.com/redhat-openshift-ecosystem/openshift-preflight
+    local-prefixes: github.com/sebrandon1/openshift-preflight
 
 output:
   format: tab

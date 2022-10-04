@@ -1,6 +1,6 @@
 package certification
 
-import "github.com/redhat-openshift-ecosystem/openshift-preflight/certification/policy"
+import "github.com/sebrandon1/openshift-preflight/certification/policy"
 
 // Config is a read-only preflight configuration.
 type Config interface {
