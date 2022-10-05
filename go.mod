@@ -11,7 +11,7 @@ require (
 	github.com/onsi/gomega v1.20.2
 	github.com/openshift/api v0.0.0-20210910062324-a41d3573a3ba
 	github.com/openshift/client-go v0.0.0-20210521082421-73d9475a9142
-	github.com/operator-framework/api v0.16.0
+	github.com/operator-framework/api v0.17.1
 	github.com/operator-framework/operator-manifest-tools v0.2.1
 	github.com/redhat-openshift-ecosystem/ocp-olm-catalog-validator v0.1.0
 	github.com/shurcooL/graphql v0.0.0-20220606043923-3cf50f8a0a29
@@ -102,7 +102,7 @@ require (
 	golang.org/x/net v0.0.0-20220722155237-a158d28d115b // indirect
 	golang.org/x/oauth2 v0.0.0-20220524215830-622c5d57e401 // indirect
 	golang.org/x/sync v0.0.0-20220722155255-886fb9371eb4 // indirect
-	golang.org/x/sys v0.0.0-20220722155257-8c9f86f7a55f // indirect
+	golang.org/x/sys v0.0.0-20220928140112-f11e5e49a4ec // indirect
 	golang.org/x/term v0.0.0-20210927222741-03fcf44c2211 // indirect
 	golang.org/x/text v0.3.7 // indirect
 	golang.org/x/time v0.0.0-20220210224613-90d013bbcef8 // indirect
@@ -129,5 +129,3 @@ require (
 )
 
 replace github.com/knqyf263/go-rpmdb => github.com/opdev/go-rpmdb v0.0.0-20220719131451-751902254f35
-
-replace github.com/operator-framework/api v0.16.0 => github.com/operator-framework/api v0.16.1-0.20220823134246-5f99430d4ec4
