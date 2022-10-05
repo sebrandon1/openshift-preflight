@@ -129,3 +129,5 @@ require (
 )
 
 replace github.com/knqyf263/go-rpmdb => github.com/opdev/go-rpmdb v0.0.0-20220719131451-751902254f35
+
+replace go.opentelemetry.io/otel => go.opentelemetry.io/otel v0.20.0
