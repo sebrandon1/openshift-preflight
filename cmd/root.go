@@ -6,8 +6,8 @@ import (
 	"io"
 	"os"
 
-	"github.com/sebrandon1/openshift-preflight/certification/artifacts"
-	"github.com/sebrandon1/openshift-preflight/version"
+	"github.com/redhat-openshift-ecosystem/openshift-preflight/certification/artifacts"
+	"github.com/redhat-openshift-ecosystem/openshift-preflight/version"
 
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"

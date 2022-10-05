@@ -5,9 +5,9 @@ All pull requests will be subject to the tests described below.
 ## Unit
 
 Unit tests are executed using [GitHub
-Actions](https://github.com/sebrandon1/openshift-preflight/actions).
+Actions](https://github.com/redhat-openshift-ecosystem/openshift-preflight/actions).
 
-Our workflows can be found [here](https://github.com/sebrandon1/openshift-preflight/tree/main/.github/workflows)
+Our workflows can be found [here](https://github.com/redhat-openshift-ecosystem/openshift-preflight/tree/main/.github/workflows)
 
 ## End-to-End
 
@@ -37,7 +37,7 @@ the [CI-Operator](https://github.com/openshift/ci-tools) to provide access to
 OCP clusters on-demand.
 
 Our presubmit definitions can be found
-[here](https://github.com/openshift/release/tree/master/ci-operator/config/sebrandon1/openshift-preflight).
+[here](https://github.com/openshift/release/tree/master/ci-operator/config/redhat-openshift-ecosystem/openshift-preflight).
 These encompass all of our test definitions that require the use of an OCP
 cluster, such as our E2E test suite.
 
@@ -49,7 +49,7 @@ The test definitions utilize our testing scripts and tooling found in
 There is a corresponding presubmit definition for each version of OCP that is
 currently used as a cluster-target for testing. As those may change over time,
 it's best to refer to the [presubmit
-definitions](https://github.com/openshift/release/tree/master/ci-operator/config/sebrandon1/openshift-preflight).
+definitions](https://github.com/openshift/release/tree/master/ci-operator/config/redhat-openshift-ecosystem/openshift-preflight).
 
 ### High-Level Workflow
 

@@ -10,9 +10,9 @@ import (
 	"path/filepath"
 	"time"
 
-	"github.com/sebrandon1/openshift-preflight/certification"
-	"github.com/sebrandon1/openshift-preflight/certification/artifacts"
-	"github.com/sebrandon1/openshift-preflight/certification/pyxis"
+	"github.com/redhat-openshift-ecosystem/openshift-preflight/certification"
+	"github.com/redhat-openshift-ecosystem/openshift-preflight/certification/artifacts"
+	"github.com/redhat-openshift-ecosystem/openshift-preflight/certification/pyxis"
 	"github.com/spf13/viper"
 
 	log "github.com/sirupsen/logrus"

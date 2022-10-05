@@ -5,9 +5,9 @@ import (
 	"context"
 	"strings"
 
-	"github.com/sebrandon1/openshift-preflight/certification/artifacts"
-	"github.com/sebrandon1/openshift-preflight/certification/formatters"
-	"github.com/sebrandon1/openshift-preflight/certification/runtime"
+	"github.com/redhat-openshift-ecosystem/openshift-preflight/certification/artifacts"
+	"github.com/redhat-openshift-ecosystem/openshift-preflight/certification/formatters"
+	"github.com/redhat-openshift-ecosystem/openshift-preflight/certification/runtime"
 
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"

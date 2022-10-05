@@ -4,7 +4,7 @@ import (
 	"io"
 	"testing"
 
-	"github.com/sebrandon1/openshift-preflight/certification"
+	"github.com/redhat-openshift-ecosystem/openshift-preflight/certification"
 
 	v1 "github.com/google/go-containerregistry/pkg/v1"
 	"github.com/google/go-containerregistry/pkg/v1/types"

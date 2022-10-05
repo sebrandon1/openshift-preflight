@@ -6,8 +6,8 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/sebrandon1/openshift-preflight/certification"
-	"github.com/sebrandon1/openshift-preflight/certification/runtime"
+	"github.com/redhat-openshift-ecosystem/openshift-preflight/certification"
+	"github.com/redhat-openshift-ecosystem/openshift-preflight/certification/runtime"
 )
 
 // ResponseFormatter describes the expected methods a formatter

@@ -12,10 +12,10 @@ import (
 	"sync"
 	"time"
 
-	"github.com/sebrandon1/openshift-preflight/certification"
-	"github.com/sebrandon1/openshift-preflight/certification/artifacts"
-	"github.com/sebrandon1/openshift-preflight/certification/internal/bundle"
-	"github.com/sebrandon1/openshift-preflight/certification/internal/openshift"
+	"github.com/redhat-openshift-ecosystem/openshift-preflight/certification"
+	"github.com/redhat-openshift-ecosystem/openshift-preflight/certification/artifacts"
+	"github.com/redhat-openshift-ecosystem/openshift-preflight/certification/internal/bundle"
+	"github.com/redhat-openshift-ecosystem/openshift-preflight/certification/internal/openshift"
 
 	"github.com/operator-framework/api/pkg/manifests"
 	operatorsv1 "github.com/operator-framework/api/pkg/operators/v1"

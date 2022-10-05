@@ -10,9 +10,9 @@ import (
 	"net/url"
 	"os"
 
-	"github.com/sebrandon1/openshift-preflight/certification"
-	"github.com/sebrandon1/openshift-preflight/certification/artifacts"
-	"github.com/sebrandon1/openshift-preflight/certification/runtime"
+	"github.com/redhat-openshift-ecosystem/openshift-preflight/certification"
+	"github.com/redhat-openshift-ecosystem/openshift-preflight/certification/artifacts"
+	"github.com/redhat-openshift-ecosystem/openshift-preflight/certification/runtime"
 
 	"github.com/google/go-containerregistry/pkg/crane"
 	"github.com/google/go-containerregistry/pkg/registry"

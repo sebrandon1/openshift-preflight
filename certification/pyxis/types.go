@@ -3,7 +3,7 @@ package pyxis
 import (
 	"time"
 
-	"github.com/sebrandon1/openshift-preflight/certification/formatters"
+	"github.com/redhat-openshift-ecosystem/openshift-preflight/certification/formatters"
 )
 
 type CertificationInput struct {

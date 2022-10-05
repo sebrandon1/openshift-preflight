@@ -4,9 +4,9 @@ import (
 	"context"
 	"os"
 
-	"github.com/sebrandon1/openshift-preflight/certification"
-	"github.com/sebrandon1/openshift-preflight/certification/artifacts"
-	"github.com/sebrandon1/openshift-preflight/certification/internal/operatorsdk"
+	"github.com/redhat-openshift-ecosystem/openshift-preflight/certification"
+	"github.com/redhat-openshift-ecosystem/openshift-preflight/certification/artifacts"
+	"github.com/redhat-openshift-ecosystem/openshift-preflight/certification/internal/operatorsdk"
 
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"

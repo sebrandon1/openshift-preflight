@@ -5,7 +5,7 @@ package version
 import "fmt"
 
 var (
-	projectName = "github.com/sebrandon1/openshift-preflight"
+	projectName = "github.com/redhat-openshift-ecosystem/openshift-preflight"
 	version     = "unknown"
 	commit      = "unknown"
 )

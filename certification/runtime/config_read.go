@@ -1,8 +1,8 @@
 package runtime
 
 import (
-	"github.com/sebrandon1/openshift-preflight/certification"
-	"github.com/sebrandon1/openshift-preflight/certification/policy"
+	"github.com/redhat-openshift-ecosystem/openshift-preflight/certification"
+	"github.com/redhat-openshift-ecosystem/openshift-preflight/certification/policy"
 )
 
 // ensure ReadOnlyConfig always implements certification.Configurable

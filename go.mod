@@ -1,4 +1,4 @@
-module github.com/sebrandon1/openshift-preflight
+module github.com/redhat-openshift-ecosystem/openshift-preflight
 
 go 1.19
 

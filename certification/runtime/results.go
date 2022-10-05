@@ -3,7 +3,7 @@ package runtime
 import (
 	"time"
 
-	"github.com/sebrandon1/openshift-preflight/certification"
+	"github.com/redhat-openshift-ecosystem/openshift-preflight/certification"
 )
 
 type Result struct {
