@@ -4,10 +4,10 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/redhat-openshift-ecosystem/openshift-preflight/certification/formatters"
-	"github.com/redhat-openshift-ecosystem/openshift-preflight/certification/runtime"
-	"github.com/redhat-openshift-ecosystem/openshift-preflight/lib"
-	"github.com/redhat-openshift-ecosystem/openshift-preflight/version"
+	"github.com/sebrandon1/openshift-preflight/certification/formatters"
+	"github.com/sebrandon1/openshift-preflight/certification/runtime"
+	"github.com/sebrandon1/openshift-preflight/lib"
+	"github.com/sebrandon1/openshift-preflight/version"
 
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"

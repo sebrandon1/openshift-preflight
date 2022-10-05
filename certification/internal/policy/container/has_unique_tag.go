@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/redhat-openshift-ecosystem/openshift-preflight/certification"
-	"github.com/redhat-openshift-ecosystem/openshift-preflight/certification/internal/authn"
+	"github.com/sebrandon1/openshift-preflight/certification"
+	"github.com/sebrandon1/openshift-preflight/certification/internal/authn"
 
 	"github.com/google/go-containerregistry/pkg/crane"
 )
