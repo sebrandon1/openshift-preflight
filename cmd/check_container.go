@@ -72,7 +72,7 @@ func checkContainerRunE(cmd *cobra.Command, args []string) error {
 
 	// Run the  container check.
 	cmd.SilenceUsage = true
-	return preflightCheck(ctx,
+	return lib.PreflightCheck(ctx,
 		checkContainer.Cfg,
 		checkContainer.Pc,
 		checkContainer.Eng,

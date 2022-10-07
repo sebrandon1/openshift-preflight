@@ -1,4 +1,4 @@
-package cmd
+package lib
 
 import (
 	"bytes"
@@ -6,7 +6,6 @@ import (
 	"encoding/json"
 	"os"
 	"path"
-	"path/filepath"
 	"strings"
 
 	"github.com/sebrandon1/openshift-preflight/certification"
@@ -16,33 +15,22 @@ import (
 	"github.com/sebrandon1/openshift-preflight/certification/policy"
 	"github.com/sebrandon1/openshift-preflight/certification/pyxis"
 	"github.com/sebrandon1/openshift-preflight/certification/runtime"
-	"github.com/sebrandon1/openshift-preflight/lib"
 
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/afero"
-	"github.com/spf13/viper"
 )
 
 var _ = Describe("Check Container Command", func() {
-	BeforeEach(createAndCleanupDirForArtifactsAndLogs)
-
-	Context("when running the check container subcommand", func() {
-		Context("With all of the required parameters", func() {
-			It("should reach the core logic, but throw an error because of the placeholder values for the container image", func() {
-				_, err := executeCommand(checkContainerCmd(), "example.com/example/image:mytag")
-				Expect(err).To(HaveOccurred())
-			})
-		})
-	})
+	// BeforeEach(createAndCleanupDirForArtifactsAndLogs)
 
 	Context("When determining container policy exceptions", func() {
-		var fakePC *fakePyxisClient
+		var fakePC *FakePyxisClient
 		BeforeEach(func() {
 			// reset the fake pyxis client before each execution
 			// as a precaution.
-			fakePC = &fakePyxisClient{
+			fakePC = &FakePyxisClient{
 				findImagesByDigestFunc: fidbFuncNoop,
 				getProjectsFunc:        gpFuncNoop,
 				submitResultsFunc:      srFuncNoop,
@@ -51,35 +39,35 @@ var _ = Describe("Check Container Command", func() {
 
 		It("should throw an error if unable to get the project from the API", func() {
 			fakePC.getProjectsFunc = gpFuncReturnError
-			_, err := lib.GetContainerPolicyExceptions(context.TODO(), fakePC)
+			_, err := GetContainerPolicyExceptions(context.TODO(), fakePC)
 			Expect(err).To(HaveOccurred())
 		})
 
 		It("should return a scratch policy exception if the project has the flag in the API", func() {
 			fakePC.getProjectsFunc = gpFuncReturnScratchException
-			p, err := lib.GetContainerPolicyExceptions(context.TODO(), fakePC)
+			p, err := GetContainerPolicyExceptions(context.TODO(), fakePC)
 			Expect(p).To(Equal(policy.PolicyScratch))
 			Expect(err).ToNot(HaveOccurred())
 		})
 
 		It("should return a root policy exception if the project has the flag in the API", func() {
 			fakePC.getProjectsFunc = gpFuncReturnRootException
-			p, err := lib.GetContainerPolicyExceptions(context.TODO(), fakePC)
+			p, err := GetContainerPolicyExceptions(context.TODO(), fakePC)
 			Expect(p).To(Equal(policy.PolicyRoot))
 			Expect(err).ToNot(HaveOccurred())
 		})
 
 		It("should return a container policy exception if the project no exceptions in the API", func() {
 			fakePC.getProjectsFunc = gpFuncReturnNoException
-			p, err := lib.GetContainerPolicyExceptions(context.TODO(), fakePC)
+			p, err := GetContainerPolicyExceptions(context.TODO(), fakePC)
 			Expect(p).To(Equal(policy.PolicyContainer))
 			Expect(err).ToNot(HaveOccurred())
 		})
 	})
 
 	Context("When using the containerCertificationSubmitter", func() {
-		var sbmt *lib.ContainerCertificationSubmitter
-		var fakePC *fakePyxisClient
+		var sbmt *ContainerCertificationSubmitter
+		var fakePC *FakePyxisClient
 		var dockerConfigPath string
 		var preflightLogPath string
 
@@ -88,19 +76,15 @@ var _ = Describe("Check Container Command", func() {
 		BeforeEach(func() {
 			dockerConfigPath = path.Join(artifacts.Path(), dockerconfigFilename)
 			preflightLogPath = path.Join(artifacts.Path(), preflightLogFilename)
-			// Normalize a fakePyxisClient with noop functions.
-			fakePC = &fakePyxisClient{
-				findImagesByDigestFunc: fidbFuncNoop,
-				getProjectsFunc:        gpFuncNoop,
-				submitResultsFunc:      srFuncNoop,
-			}
+			// Normalize a FakePyxisClient with noop functions.
+			fakePC = NewFakePyxisClientNoop()
 
 			// Most tests will need a passing getProjects func so set that to
 			// avoid having to perform multiple BeforeEaches
 			fakePC.setGPFuncReturnBaseProject("")
 
 			// configure the submitter
-			sbmt = &lib.ContainerCertificationSubmitter{
+			sbmt = &ContainerCertificationSubmitter{
 				CertificationProjectID: fakePC.baseProject("").ID,
 				Pyxis:                  fakePC,
 				DockerConfig:           dockerConfigPath,
@@ -262,14 +246,14 @@ var _ = Describe("Check Container Command", func() {
 
 	Context("When using the noop submitter", func() {
 		var bf *bytes.Buffer
-		var noop *lib.NoopSubmitter
+		var noop *NoopSubmitter
 
 		BeforeEach(func() {
 			bufferLogger := logrus.New()
 			bf = bytes.NewBuffer([]byte{})
 			bufferLogger.SetOutput(bf)
 
-			noop = lib.NewNoopSubmitter(false, "", bufferLogger)
+			noop = NewNoopSubmitter(false, "", bufferLogger)
 		})
 
 		Context("and enabling log emitting", func() {
@@ -312,12 +296,12 @@ var _ = Describe("Check Container Command", func() {
 				LogFile:                "logfile",
 			}
 
-			pc := lib.NewPyxisClient(context.TODO(), cfg.ReadOnly())
+			pc := NewPyxisClient(context.TODO(), cfg.ReadOnly())
 			Expect(pc).ToNot(BeNil())
 
 			It("should return a containerCertificationSubmitter", func() {
-				submitter := lib.ResolveSubmitter(pc, cfg.ReadOnly())
-				typed, ok := submitter.(*lib.ContainerCertificationSubmitter)
+				submitter := ResolveSubmitter(pc, cfg.ReadOnly())
+				typed, ok := submitter.(*ContainerCertificationSubmitter)
 				Expect(typed).ToNot(BeNil())
 				Expect(ok).To(BeTrue())
 			})
@@ -326,8 +310,8 @@ var _ = Describe("Check Container Command", func() {
 		Context("With no pyxis client", func() {
 			cfg := runtime.Config{}
 			It("should return a no-op submitter", func() {
-				submitter := lib.ResolveSubmitter(nil, cfg.ReadOnly())
-				typed, ok := submitter.(*lib.NoopSubmitter)
+				submitter := ResolveSubmitter(nil, cfg.ReadOnly())
+				typed, ok := submitter.(*NoopSubmitter)
 				Expect(typed).ToNot(BeNil())
 				Expect(ok).To(BeTrue())
 			})
@@ -339,7 +323,7 @@ var _ = Describe("Check Container Command", func() {
 			cfgNoCertProjectID := runtime.Config{}
 
 			It("Should return a nil pyxis client", func() {
-				pc := lib.NewPyxisClient(context.TODO(), cfgNoCertProjectID.ReadOnly())
+				pc := NewPyxisClient(context.TODO(), cfgNoCertProjectID.ReadOnly())
 				Expect(pc).To(BeNil())
 			})
 		})
@@ -361,13 +345,13 @@ var _ = Describe("Check Container Command", func() {
 			}
 
 			It("Should return a nil pyxis client", func() {
-				pc := lib.NewPyxisClient(context.TODO(), cfgMissingCertProjectID.ReadOnly())
+				pc := NewPyxisClient(context.TODO(), cfgMissingCertProjectID.ReadOnly())
 				Expect(pc).To(BeNil())
 
-				pc = lib.NewPyxisClient(context.TODO(), cfgMissingPyxisHost.ReadOnly())
+				pc = NewPyxisClient(context.TODO(), cfgMissingPyxisHost.ReadOnly())
 				Expect(pc).To(BeNil())
 
-				pc = lib.NewPyxisClient(context.TODO(), cfgMissingPyxisAPIToken.ReadOnly())
+				pc = NewPyxisClient(context.TODO(), cfgMissingPyxisAPIToken.ReadOnly())
 				Expect(pc).To(BeNil())
 			})
 		})
@@ -380,7 +364,7 @@ var _ = Describe("Check Container Command", func() {
 			}
 
 			It("should return a pyxis client", func() {
-				pc := lib.NewPyxisClient(context.TODO(), cfgValid.ReadOnly())
+				pc := NewPyxisClient(context.TODO(), cfgValid.ReadOnly())
 				Expect(pc).ToNot(BeNil())
 			})
 		})
@@ -398,27 +382,9 @@ var _ = Describe("Check Container Command", func() {
 
 		Context("and the user passed the submit flag, but no credentials", func() {
 			It("should return a noop submitter as credentials are required for submission", func() {
-				runner, err := lib.NewCheckContainerRunner(context.TODO(), cfg, false)
+				runner, err := NewCheckContainerRunner(context.TODO(), cfg, false)
 				Expect(err).ToNot(HaveOccurred())
-				_, rsIsCorrectType := runner.Rs.(*lib.NoopSubmitter)
-				Expect(rsIsCorrectType).To(BeTrue())
-			})
-		})
-
-		Context("and the user did not pass the submit flag", func() {
-			var origSubmitValue bool
-			BeforeEach(func() {
-				origSubmitValue = submit
-				submit = false
-			})
-
-			AfterEach(func() {
-				submit = origSubmitValue
-			})
-			It("should return a noopSubmitter resultSubmitter", func() {
-				runner, err := lib.NewCheckContainerRunner(context.TODO(), cfg, false)
-				Expect(err).ToNot(HaveOccurred())
-				_, rsIsCorrectType := runner.Rs.(*lib.NoopSubmitter)
+				_, rsIsCorrectType := runner.Rs.(*NoopSubmitter)
 				Expect(rsIsCorrectType).To(BeTrue())
 			})
 		})
@@ -426,7 +392,7 @@ var _ = Describe("Check Container Command", func() {
 		Context("with a valid policy formatter", func() {
 			It("should return with no error, and the appropriate formatter", func() {
 				cfg.ResponseFormat = "xml"
-				runner, err := lib.NewCheckContainerRunner(context.TODO(), cfg, false)
+				runner, err := NewCheckContainerRunner(context.TODO(), cfg, false)
 				Expect(err).ToNot(HaveOccurred())
 				expectedFormatter, err := formatters.NewByName(cfg.ResponseFormat)
 				Expect(err).ToNot(HaveOccurred())
@@ -436,7 +402,7 @@ var _ = Describe("Check Container Command", func() {
 
 		Context("with an invalid policy definition", func() {
 			It("should return the container policy engine anyway", func() {
-				runner, err := lib.NewCheckContainerRunner(context.TODO(), cfg, false)
+				runner, err := NewCheckContainerRunner(context.TODO(), cfg, false)
 				Expect(err).ToNot(HaveOccurred())
 
 				expectedEngine, err := engine.NewForConfig(context.TODO(), cfg.ReadOnly())
@@ -450,129 +416,16 @@ var _ = Describe("Check Container Command", func() {
 		Context("with an invalid formatter definition", func() {
 			It("should return an error", func() {
 				cfg.ResponseFormat = "foo"
-				_, err := lib.NewCheckContainerRunner(context.TODO(), cfg, false)
+				_, err := NewCheckContainerRunner(context.TODO(), cfg, false)
 				Expect(err).To(HaveOccurred())
 			})
 		})
 
 		It("should contain a ResultWriterFile resultWriter", func() {
-			runner, err := lib.NewCheckContainerRunner(context.TODO(), cfg, false)
+			runner, err := NewCheckContainerRunner(context.TODO(), cfg, false)
 			Expect(err).ToNot(HaveOccurred())
 			_, rwIsExpectedType := runner.Rw.(*runtime.ResultWriterFile)
 			Expect(rwIsExpectedType).To(BeTrue())
-		})
-	})
-
-	Context("When validating check container arguments and flags", func() {
-		Context("and the user provided more than 1 positional arg", func() {
-			It("should fail to run", func() {
-				_, err := executeCommand(checkContainerCmd(), "foo", "bar")
-				Expect(err).To(HaveOccurred())
-			})
-		})
-
-		Context("and the user provided less than 1 positional arg", func() {
-			It("should fail to run", func() {
-				_, err := executeCommand(checkContainerCmd())
-				Expect(err).To(HaveOccurred())
-			})
-		})
-
-		DescribeTable("and the user has enabled the submit flag",
-			func(errString string, args []string) {
-				out, err := executeCommand(checkContainerCmd(), args...)
-				Expect(err).To(HaveOccurred())
-				Expect(out).To(ContainSubstring(errString))
-			},
-			Entry("certification-project-id and pyxis-api-token are not supplied", "certification Project ID must be specified when --submit is present", []string{"--submit", "foo"}),
-			Entry("pyxis-api-token is not supplied", "pyxis API Token must be specified when --submit is present", []string{"foo", "--submit", "--certification-project-id=fooid"}),
-			Entry("certification-project-id is not supplied", "certification Project ID must be specified when --submit is present", []string{"--submit", "foo", "--pyxis-api-token=footoken"}),
-			Entry("pyxis-api-token flag is present but empty because of '='", "cannot be empty when --submit is present", []string{"foo", "--submit", "--certification-project-id=fooid", "--pyxis-api-token="}),
-			Entry("certification-project-id flag is present but empty because of '='", "cannot be empty when --submit is present", []string{"foo", "--submit", "--certification-project-id=", "--pyxis-api-token=footoken"}),
-			Entry("submit is passed after empty api token", "pyxis API token and certification ID are required when --submit is present", []string{"foo", "--certification-project-id=fooid", "--pyxis-api-token", "--submit"}),
-			Entry("submit is passed with explicit value after empty api token", "pyxis API token and certification ID are required when --submit is present", []string{"foo", "--certification-project-id=fooid", "--pyxis-api-token", "--submit=true"}),
-		)
-
-		When("the user enables the submit flag", func() {
-			When("environment variables are used for certification ID and api token", func() {
-				BeforeEach(func() {
-					os.Setenv("PFLT_CERTIFICATION_PROJECT_ID", "certid")
-					os.Setenv("PFLT_PYXIS_API_TOKEN", "tokenid")
-					DeferCleanup(os.Unsetenv, "PFLT_CERTIFICATION_PROJECT_ID")
-					DeferCleanup(os.Unsetenv, "PFLT_PYXIS_API_TOKEN")
-				})
-				It("should still execute with no error", func() {
-					submit = true
-
-					err := checkContainerPositionalArgs(checkContainerCmd(), []string{"foo"})
-					Expect(err).ToNot(HaveOccurred())
-					Expect(viper.GetString("pyxis_api_token")).To(Equal("tokenid"))
-					Expect(viper.GetString("certification_project_id")).To(Equal("certid"))
-				})
-			})
-			When("a config file is used", func() {
-				BeforeEach(func() {
-					config := `pyxis_api_token: mytoken
-certification_project_id: mycertid`
-					tempDir, err := os.MkdirTemp("", "check-container-submit-*")
-					Expect(err).ToNot(HaveOccurred())
-					err = os.WriteFile(filepath.Join(tempDir, "config.yaml"), bytes.NewBufferString(config).Bytes(), 0o644)
-					Expect(err).ToNot(HaveOccurred())
-					viper.AddConfigPath(tempDir)
-					DeferCleanup(os.RemoveAll, tempDir)
-				})
-				It("should still execute with no error", func() {
-					// Make sure that we've read the config file
-					initConfig()
-					submit = true
-
-					err := checkContainerPositionalArgs(checkContainerCmd(), []string{"foo"})
-					Expect(err).ToNot(HaveOccurred())
-					Expect(viper.GetString("pyxis_api_token")).To(Equal("mytoken"))
-					Expect(viper.GetString("certification_project_id")).To(Equal("mycertid"))
-				})
-			})
-		})
-	})
-
-	Context("When validating the certification-project-id flag", func() {
-		Context("and the flag is set properly", func() {
-			BeforeEach(func() {
-				viper.Set("certification_project_id", "123456789")
-			})
-			It("should not change the flag value", func() {
-				err := validateCertificationProjectID(checkContainerCmd(), []string{"foo"})
-				Expect(err).ToNot(HaveOccurred())
-				Expect(viper.GetString("certification_project_id")).To(Equal("123456789"))
-			})
-		})
-		Context("and a valid ospid format is provided", func() {
-			BeforeEach(func() {
-				viper.Set("certification_project_id", "ospid-123456789")
-			})
-			It("should strip ospid- from the flag value", func() {
-				err := validateCertificationProjectID(checkContainerCmd(), []string{"foo"})
-				Expect(err).ToNot(HaveOccurred())
-				Expect(viper.GetString("certification_project_id")).To(Equal("123456789"))
-			})
-		})
-		Context("and a legacy format with ospid is provided", func() {
-			BeforeEach(func() {
-				viper.Set("certification_project_id", "ospid-62423-f26c346-6cc1dc7fae92")
-			})
-			It("should throw an error", func() {
-				err := validateCertificationProjectID(checkContainerCmd(), []string{"foo"})
-				Expect(err).To(HaveOccurred())
-			})
-		})
-		Context("and a legacy format without ospid is provided", func() {
-			BeforeEach(func() {
-				viper.Set("certification_project_id", "62423-f26c346-6cc1dc7fae92")
-			})
-			It("should throw an error", func() {
-				err := validateCertificationProjectID(checkContainerCmd(), []string{"foo"})
-				Expect(err).To(HaveOccurred())
-			})
 		})
 	})
 })
