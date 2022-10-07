@@ -1,6 +1,7 @@
-package cmd
+package lib
 
 import (
+	"bytes"
 	"context"
 	"fmt"
 	"io"
@@ -11,20 +12,19 @@ import (
 	"github.com/sebrandon1/openshift-preflight/certification/engine"
 	"github.com/sebrandon1/openshift-preflight/certification/formatters"
 	"github.com/sebrandon1/openshift-preflight/certification/runtime"
-	"github.com/sebrandon1/openshift-preflight/lib"
 
 	log "github.com/sirupsen/logrus"
 )
 
-// preflightCheck executes checks, interacts with pyxis, format output, writes, and submits results.
-func preflightCheck(
+// PreflightCheck executes checks, interacts with pyxis, format output, writes, and submits results.
+func PreflightCheck(
 	ctx context.Context,
 	cfg *runtime.Config,
-	pc lib.PyxisClient, //nolint:unparam // pyxisClient is currently unused.
+	pc PyxisClient, //nolint:unparam // pyxisClient is currently unused.
 	eng engine.CheckEngine,
 	formatter formatters.ResponseFormatter,
-	rw lib.ResultWriter,
-	rs lib.ResultSubmitter,
+	rw ResultWriter,
+	rs ResultSubmitter,
 ) error {
 	// configure the artifacts directory if the user requested a different directory.
 	if cfg.Artifacts != "" {
@@ -74,4 +74,38 @@ func preflightCheck(
 	log.Infof("Preflight result: %s", convertPassedOverall(results.PassedOverall))
 
 	return nil
+}
+
+func writeJUnit(ctx context.Context, results runtime.Results) error {
+	var cfg runtime.Config
+	cfg.ResponseFormat = "junitxml"
+
+	junitformatter, err := formatters.NewForConfig(cfg.ReadOnly())
+	if err != nil {
+		return err
+	}
+	junitResults, err := junitformatter.Format(ctx, results)
+	if err != nil {
+		return err
+	}
+
+	junitFilename, err := artifacts.WriteFile("results-junit.xml", bytes.NewReader((junitResults)))
+	if err != nil {
+		return err
+	}
+	log.Tracef("JUnitXML written to %s", junitFilename)
+
+	return nil
+}
+
+func resultsFilenameWithExtension(ext string) string {
+	return strings.Join([]string{"results", ext}, ".")
+}
+
+func convertPassedOverall(passedOverall bool) string {
+	if passedOverall {
+		return "PASSED"
+	}
+
+	return "FAILED"
 }
