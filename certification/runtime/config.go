@@ -56,6 +56,16 @@ func NewConfigFrom(vcfg viper.Viper) (*Config, error) {
 	return &cfg, nil
 }
 
+func NewManualConfig(image, responseFormat, artifactsDir string, submit, writeJUnit bool) *Config {
+	return &Config{
+		Image:          image,
+		Submit:         submit,
+		WriteJUnit:     writeJUnit,
+		ResponseFormat: responseFormat,
+		Artifacts:      artifactsDir,
+	}
+}
+
 // storeContainerPolicyConfiguration reads container-policy-specific config
 // items in viper, normalizes them, and stores them in Config.
 func (c *Config) storeContainerPolicyConfiguration(vcfg viper.Viper) {
