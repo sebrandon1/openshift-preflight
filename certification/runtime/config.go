@@ -56,13 +56,27 @@ func NewConfigFrom(vcfg viper.Viper) (*Config, error) {
 	return &cfg, nil
 }
 
-func NewManualConfig(image, responseFormat, artifactsDir string, submit, writeJUnit bool) *Config {
+func NewManualContainerConfig(image, responseFormat, artifactsDir string, submit, writeJUnit, bundle, scratch bool) *Config {
 	return &Config{
 		Image:          image,
 		Submit:         submit,
 		WriteJUnit:     writeJUnit,
 		ResponseFormat: responseFormat,
 		Artifacts:      artifactsDir,
+	}
+}
+
+func NewManualOperatorConfig(image, responseFormat, artifactsDir string, writeJUnit bool) *Config {
+	return &Config{
+		Image:          image,
+		Submit:         false, // operator results are not submitted
+		WriteJUnit:     writeJUnit,
+		ResponseFormat: responseFormat,
+		Artifacts:      artifactsDir,
+
+		// Operator only settings
+		Bundle:  false,
+		Scratch: false,
 	}
 }
 
