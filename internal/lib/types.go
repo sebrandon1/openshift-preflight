@@ -10,26 +10,27 @@ import (
 	"path/filepath"
 	"time"
 
+	"github.com/spf13/viper"
+
 	"github.com/redhat-openshift-ecosystem/openshift-preflight/certification"
 	"github.com/redhat-openshift-ecosystem/openshift-preflight/certification/artifacts"
 	"github.com/redhat-openshift-ecosystem/openshift-preflight/certification/pyxis"
-	"github.com/spf13/viper"
 
 	log "github.com/sirupsen/logrus"
 )
 
-// resultWriter defines methods associated with writing check results.
+// ResultWriter defines methods associated with writing check results.
 type ResultWriter interface {
 	OpenFile(name string) (io.WriteCloser, error)
 	io.WriteCloser
 }
 
-// resultSubmitter defines methods associated with submitting results to Red HAt.
+// ResultSubmitter defines methods associated with submitting results to Red HAt.
 type ResultSubmitter interface {
 	Submit(context.Context) error
 }
 
-// pyxisClient defines pyxis API interactions that are relevant to check executions in cmd.
+// PyxisClient defines pyxis API interactions that are relevant to check executions in cmd.
 type PyxisClient interface {
 	FindImagesByDigest(ctx context.Context, digests []string) ([]pyxis.CertImage, error)
 	GetProject(context.Context) (*pyxis.CertProject, error)
@@ -55,7 +56,7 @@ func NewPyxisClient(ctx context.Context, cfg certification.Config) PyxisClient {
 }
 
 // ContainerCertificationSubmitter submits container results to Pyxis, and implements
-// a resultSubmitter.
+// a ResultSubmitter.
 type ContainerCertificationSubmitter struct {
 	CertificationProjectID string
 	Pyxis                  PyxisClient
@@ -177,7 +178,7 @@ func (s *ContainerCertificationSubmitter) Submit(ctx context.Context) error {
 	return nil
 }
 
-// noopSubmitter is a no-op resultSubmitter that optionally logs a message
+// noopSubmitter is a no-op ResultSubmitter that optionally logs a message
 // and a reason as to why results were not submitted.
 type NoopSubmitter struct {
 	emitLog bool

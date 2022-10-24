@@ -8,9 +8,11 @@ import (
 
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
-	"github.com/redhat-openshift-ecosystem/openshift-preflight/certification/runtime"
-	"github.com/redhat-openshift-ecosystem/openshift-preflight/lib"
 	"github.com/spf13/viper"
+
+	"github.com/redhat-openshift-ecosystem/openshift-preflight/certification/formatters"
+	"github.com/redhat-openshift-ecosystem/openshift-preflight/certification/runtime"
+	"github.com/redhat-openshift-ecosystem/openshift-preflight/internal/lib"
 )
 
 var _ = Describe("Check Container Command", func() {
@@ -146,12 +148,17 @@ certification_project_id: mycertid`
 			BeforeEach(func() {
 				origSubmitValue = submit
 				submit = false
+
+				cfg = &runtime.Config{
+					Image:          "quay.io/example/foo:latest",
+					ResponseFormat: formatters.DefaultFormat,
+				}
 			})
 
 			AfterEach(func() {
 				submit = origSubmitValue
 			})
-			It("should return a noopSubmitter resultSubmitter", func() {
+			It("should return a noopSubmitter ResultSubmitter", func() {
 				runner, err := lib.NewCheckContainerRunner(context.TODO(), cfg, false)
 				Expect(err).ToNot(HaveOccurred())
 				_, rsIsCorrectType := runner.Rs.(*lib.NoopSubmitter)

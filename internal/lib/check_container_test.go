@@ -421,7 +421,7 @@ var _ = Describe("Check Container Command", func() {
 			})
 		})
 
-		It("should contain a ResultWriterFile resultWriter", func() {
+		It("should contain a ResultWriterFile ResultWriter", func() {
 			runner, err := NewCheckContainerRunner(context.TODO(), cfg, false)
 			Expect(err).ToNot(HaveOccurred())
 			_, rwIsExpectedType := runner.Rw.(*runtime.ResultWriterFile)

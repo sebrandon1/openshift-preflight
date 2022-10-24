@@ -8,7 +8,7 @@ import (
 	"github.com/redhat-openshift-ecosystem/openshift-preflight/certification/formatters"
 	"github.com/redhat-openshift-ecosystem/openshift-preflight/certification/policy"
 	"github.com/redhat-openshift-ecosystem/openshift-preflight/certification/runtime"
-	"github.com/redhat-openshift-ecosystem/openshift-preflight/lib"
+	"github.com/redhat-openshift-ecosystem/openshift-preflight/internal/lib"
 
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
@@ -167,7 +167,7 @@ var _ = Describe("Check Operator", func() {
 			})
 		})
 
-		It("should contain a ResultWriterFile resultWriter", func() {
+		It("should contain a ResultWriterFile ResultWriter", func() {
 			runner, err := lib.NewCheckOperatorRunner(context.TODO(), cfg)
 			Expect(err).ToNot(HaveOccurred())
 			_, rwIsExpectedType := runner.Rw.(*runtime.ResultWriterFile)

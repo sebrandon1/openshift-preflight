@@ -8,13 +8,14 @@ import (
 	"os"
 	"strings"
 
+	log "github.com/sirupsen/logrus"
+
 	"github.com/redhat-openshift-ecosystem/openshift-preflight/certification"
 	"github.com/redhat-openshift-ecosystem/openshift-preflight/certification/artifacts"
 	"github.com/redhat-openshift-ecosystem/openshift-preflight/certification/engine"
 	"github.com/redhat-openshift-ecosystem/openshift-preflight/certification/formatters"
 	"github.com/redhat-openshift-ecosystem/openshift-preflight/certification/policy"
 	"github.com/redhat-openshift-ecosystem/openshift-preflight/certification/runtime"
-	log "github.com/sirupsen/logrus"
 )
 
 // CheckContainerRunner contains all of the components necessary to run checkContainer.
@@ -96,7 +97,7 @@ func NewCheckOperatorRunner(ctx context.Context, cfg *runtime.Config) (*CheckOpe
 	}, nil
 }
 
-// resolveSubmitter will build out a resultSubmitter if the provided pyxisClient, pc, is not nil.
+// resolveSubmitter will build out a ResultSubmitter if the provided pyxisClient, pc, is not nil.
 // The pyxisClient is a required component of the submitter. If pc is nil, then a noop submitter
 // is returned instead, which does nothing.
 func ResolveSubmitter(pc PyxisClient, cfg certification.Config) ResultSubmitter {
@@ -138,7 +139,7 @@ func GetContainerPolicyExceptions(ctx context.Context, pc PyxisClient) (policy.P
 func PreflightCheck(
 	ctx context.Context,
 	cfg *runtime.Config,
-	pc PyxisClient, //nolint:unparam // pyxisClient is currently unused.
+	pc PyxisClient, //nolint:unparam // PyxisClient is currently unused.
 	eng engine.CheckEngine,
 	formatter formatters.ResponseFormatter,
 	rw ResultWriter,

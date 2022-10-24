@@ -198,7 +198,7 @@ func (e fakeCheckEngine) Results(ctx context.Context) runtime.Results {
 	}
 }
 
-// badResultWriter implements resultWriter and will automatically fail with the
+// badResultWriter implements ResultWriter and will automatically fail with the
 // provided errmsg.
 type badResultWriter struct {
 	errmsg string
@@ -233,7 +233,7 @@ func (f *badFormatter) Format(ctx context.Context, r runtime.Results) ([]byte, e
 	return nil, errors.New(f.errormsg)
 }
 
-// badResultSubmitter implements resultSubmitter and fails to submit with the included errmsg.
+// badResultSubmitter implements ResultSubmitter and fails to submit with the included errmsg.
 type badResultSubmitter struct {
 	errmsg string
 }
