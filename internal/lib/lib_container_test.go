@@ -22,8 +22,8 @@ import (
 	"github.com/spf13/afero"
 )
 
-var _ = Describe("Check Container Command", func() {
-	// BeforeEach(createAndCleanupDirForArtifactsAndLogs)
+var _ = Describe("Lib Container Functions", func() {
+	BeforeEach(createAndCleanupDirForArtifactsAndLogs)
 
 	Context("When determining container policy exceptions", func() {
 		var fakePC *FakePyxisClient
