@@ -178,7 +178,7 @@ func (s *ContainerCertificationSubmitter) Submit(ctx context.Context) error {
 	return nil
 }
 
-// noopSubmitter is a no-op ResultSubmitter that optionally logs a message
+// NoopSubmitter is a no-op ResultSubmitter that optionally logs a message
 // and a reason as to why results were not submitted.
 type NoopSubmitter struct {
 	emitLog bool

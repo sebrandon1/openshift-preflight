@@ -65,7 +65,7 @@ func NewCheckContainerRunner(ctx context.Context, cfg *runtime.Config, submit bo
 	}, nil
 }
 
-// checkOperatorRunner contains all of the components necessary to run checkOperator.
+// CheckOperatorRunner contains all of the components necessary to run checkOperator.
 type CheckOperatorRunner struct {
 	Cfg       *runtime.Config
 	Eng       engine.CheckEngine
@@ -73,7 +73,7 @@ type CheckOperatorRunner struct {
 	Rw        ResultWriter
 }
 
-// newCheckOperatorRunner returns a checkOperatorRunner containing all of the tooling necessary
+// NewCheckOperatorRunner returns a CheckOperatorRunner containing all of the tooling necessary
 // to run checkOperator.
 func NewCheckOperatorRunner(ctx context.Context, cfg *runtime.Config) (*CheckOperatorRunner, error) {
 	cfg.Policy = policy.PolicyOperator
@@ -97,7 +97,7 @@ func NewCheckOperatorRunner(ctx context.Context, cfg *runtime.Config) (*CheckOpe
 	}, nil
 }
 
-// resolveSubmitter will build out a ResultSubmitter if the provided pyxisClient, pc, is not nil.
+// ResolveSubmitter will build out a ResultSubmitter if the provided pyxisClient, pc, is not nil.
 // The pyxisClient is a required component of the submitter. If pc is nil, then a noop submitter
 // is returned instead, which does nothing.
 func ResolveSubmitter(pc PyxisClient, cfg certification.Config) ResultSubmitter {
