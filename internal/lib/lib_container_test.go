@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"os"
 	"path"
+	"path/filepath"
 	"strings"
 
 	"github.com/redhat-openshift-ecosystem/openshift-preflight/certification"
@@ -426,6 +427,32 @@ var _ = Describe("Lib Container Functions", func() {
 			Expect(err).ToNot(HaveOccurred())
 			_, rwIsExpectedType := runner.Rw.(*runtime.ResultWriterFile)
 			Expect(rwIsExpectedType).To(BeTrue())
+		})
+	})
+
+	Describe("JUnit", func() {
+		var results *runtime.Results
+		var junitfile string
+
+		BeforeEach(func() {
+			results = &runtime.Results{
+				TestedImage:       "registry.example.com/example/image:0.0.1",
+				PassedOverall:     true,
+				TestedOn:          runtime.UnknownOpenshiftClusterVersion(),
+				CertificationHash: "sha256:deadb33f",
+				Passed:            []runtime.Result{},
+				Failed:            []runtime.Result{},
+				Errors:            []runtime.Result{},
+			}
+			junitfile = filepath.Join(artifacts.Path(), "results-junit.xml")
+		})
+
+		When("The additional JUnitXML results file is requested", func() {
+			It("should be written to the artifacts directory without error", func() {
+				Expect(writeJUnit(context.TODO(), *results)).To(Succeed())
+				_, err := os.Stat(junitfile)
+				Expect(err).ToNot(HaveOccurred())
+			})
 		})
 	})
 })

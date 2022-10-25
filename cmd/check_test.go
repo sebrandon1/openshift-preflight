@@ -1,12 +1,9 @@
 package cmd
 
 import (
-	"context"
 	"os"
-	"path/filepath"
 
 	"github.com/redhat-openshift-ecosystem/openshift-preflight/certification/artifacts"
-	"github.com/redhat-openshift-ecosystem/openshift-preflight/certification/runtime"
 	"github.com/redhat-openshift-ecosystem/openshift-preflight/internal/lib"
 
 	. "github.com/onsi/ginkgo/v2"
@@ -94,32 +91,6 @@ var _ = Describe("cmd package check command", func() {
 				expected := "https://connect.redhat.com/projects/this-is-my-project-id/images/my-image-id/scan-results"
 				actual := lib.BuildScanResultsURL(projectID, imageID)
 				Expect(expected).To(Equal(actual))
-			})
-		})
-	})
-
-	Describe("JUnit", func() {
-		var results *runtime.Results
-		var junitfile string
-
-		BeforeEach(func() {
-			results = &runtime.Results{
-				TestedImage:       "registry.example.com/example/image:0.0.1",
-				PassedOverall:     true,
-				TestedOn:          runtime.UnknownOpenshiftClusterVersion(),
-				CertificationHash: "sha256:deadb33f",
-				Passed:            []runtime.Result{},
-				Failed:            []runtime.Result{},
-				Errors:            []runtime.Result{},
-			}
-			junitfile = filepath.Join(artifacts.Path(), "results-junit.xml")
-		})
-
-		When("The additional JUnitXML results file is requested", func() {
-			It("should be written to the artifacts directory without error", func() {
-				Expect(writeJUnit(context.TODO(), *results)).To(Succeed())
-				_, err := os.Stat(junitfile)
-				Expect(err).ToNot(HaveOccurred())
 			})
 		})
 	})

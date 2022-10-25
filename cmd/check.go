@@ -1,15 +1,8 @@
 package cmd
 
 import (
-	"bytes"
-	"context"
 	"strings"
 
-	"github.com/redhat-openshift-ecosystem/openshift-preflight/certification/artifacts"
-	"github.com/redhat-openshift-ecosystem/openshift-preflight/certification/formatters"
-	"github.com/redhat-openshift-ecosystem/openshift-preflight/certification/runtime"
-
-	log "github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )
@@ -33,29 +26,6 @@ func checkCmd() *cobra.Command {
 	checkCmd.AddCommand(checkOperatorCmd())
 
 	return checkCmd
-}
-
-// writeJUnit will write results as JUnit XML using the built-in formatter.
-func writeJUnit(ctx context.Context, results runtime.Results) error {
-	var cfg runtime.Config
-	cfg.ResponseFormat = "junitxml"
-
-	junitformatter, err := formatters.NewForConfig(cfg.ReadOnly())
-	if err != nil {
-		return err
-	}
-	junitResults, err := junitformatter.Format(ctx, results)
-	if err != nil {
-		return err
-	}
-
-	junitFilename, err := artifacts.WriteFile("results-junit.xml", bytes.NewReader((junitResults)))
-	if err != nil {
-		return err
-	}
-	log.Tracef("JUnitXML written to %s", junitFilename)
-
-	return nil
 }
 
 func resultsFilenameWithExtension(ext string) string {
