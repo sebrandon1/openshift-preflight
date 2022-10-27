@@ -4,8 +4,8 @@ package preflight_test
 // 	"context"
 // 	"testing"
 
-// 	preflight "github.com/redhat-openshift-ecosystem/openshift-preflight"
-// 	"github.com/redhat-openshift-ecosystem/openshift-preflight/certification/formatters"
+// 	preflight "github.com/sebrandon1/openshift-preflight"
+// 	"github.com/sebrandon1/openshift-preflight/certification/formatters"
 // 	"github.com/stretchr/testify/assert"
 // )
 

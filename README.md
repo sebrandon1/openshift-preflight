@@ -1,6 +1,6 @@
 # Preflight
 
-[![Build Status](https://github.com/redhat-openshift-ecosystem/openshift-preflight/actions/workflows/go.yml/badge.svg)](https://github.com/redhat-openshift-ecosystem/openshift-preflight/actions?workflow=go)
+[![Build Status](https://github.com/sebrandon1/openshift-preflight/actions/workflows/go.yml/badge.svg)](https://github.com/sebrandon1/openshift-preflight/actions?workflow=go)
 [![Coverage Status](https://coveralls.io/repos/github/redhat-openshift-ecosystem/openshift-preflight/badge.svg?branch=main)](https://coveralls.io/github/redhat-openshift-ecosystem/openshift-preflight?branch=main)
 
 **Preflight** is a command line (CLI) tool to verify that partner-submitted containers meet minimum requirements for Red Hat Software Certification. These include:
@@ -137,7 +137,7 @@ The version information should be displayed.
 preflight version 0.0.0 <commit: 2d3bb671bff8a95d385621382f31215234877d44>
 ```
 
-[releases_link]:https://github.com/redhat-openshift-ecosystem/openshift-preflight/releases
+[releases_link]:https://github.com/sebrandon1/openshift-preflight/releases
 
 ## Preflight Testing
 

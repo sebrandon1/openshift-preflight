@@ -29,7 +29,7 @@ LABEL name="Preflight" \
       version="1" \
       summary="Provides the OpenShift Preflight certification tool." \
       description="Preflight runs certification checks against containers and Operators." \
-      url="https://github.com/redhat-openshift-ecosystem/openshift-preflight" \
+      url="https://github.com/sebrandon1/openshift-preflight" \
       release=${release_tag} \
       vcs-ref=${preflight_commit}
 

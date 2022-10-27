@@ -5,8 +5,8 @@ import (
 	"errors"
 	"testing"
 
-	"github.com/redhat-openshift-ecosystem/openshift-preflight/certification"
-	"github.com/redhat-openshift-ecosystem/openshift-preflight/certification/internal/operatorsdk"
+	"github.com/sebrandon1/openshift-preflight/certification"
+	"github.com/sebrandon1/openshift-preflight/certification/internal/operatorsdk"
 
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
