@@ -3,9 +3,9 @@ package preflight
 import (
 	"context"
 
-	"github.com/redhat-openshift-ecosystem/openshift-preflight/certification/policy"
-	"github.com/redhat-openshift-ecosystem/openshift-preflight/certification/runtime"
-	"github.com/redhat-openshift-ecosystem/openshift-preflight/internal/lib"
+	"github.com/sebrandon1/openshift-preflight/certification/policy"
+	"github.com/sebrandon1/openshift-preflight/certification/runtime"
+	"github.com/sebrandon1/openshift-preflight/internal/lib"
 )
 
 type operatorCheckOption = func(*operatorCheck)

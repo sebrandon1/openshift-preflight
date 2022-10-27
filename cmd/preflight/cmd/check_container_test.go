@@ -10,9 +10,9 @@ import (
 	. "github.com/onsi/gomega"
 	"github.com/spf13/viper"
 
-	"github.com/redhat-openshift-ecosystem/openshift-preflight/certification/formatters"
-	"github.com/redhat-openshift-ecosystem/openshift-preflight/certification/runtime"
-	"github.com/redhat-openshift-ecosystem/openshift-preflight/internal/lib"
+	"github.com/sebrandon1/openshift-preflight/certification/formatters"
+	"github.com/sebrandon1/openshift-preflight/certification/runtime"
+	"github.com/sebrandon1/openshift-preflight/internal/lib"
 )
 
 var _ = Describe("Check Container Command", func() {

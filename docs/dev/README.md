@@ -35,9 +35,9 @@ In order for a given asset (container or operator) to pass certification, it
 must pass all checks defined in the corresponding policy.
 
 The project has an [Operator
-policy](https://github.com/redhat-openshift-ecosystem/openshift-preflight/blob/main/certification/engine/engine.go#L101)
+policy](https://github.com/sebrandon1/openshift-preflight/blob/main/certification/engine/engine.go#L101)
 and a [Container
-policy](https://github.com/redhat-openshift-ecosystem/openshift-preflight/blob/main/certification/engine/engine.go#L101),
+policy](https://github.com/sebrandon1/openshift-preflight/blob/main/certification/engine/engine.go#L101),
 corresponding with the validations `preflight check` implements. Each
 implemented policy has its own checks.
 

@@ -9,8 +9,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/redhat-openshift-ecosystem/openshift-preflight/certification"
-	"github.com/redhat-openshift-ecosystem/openshift-preflight/certification/runtime"
+	"github.com/sebrandon1/openshift-preflight/certification"
+	"github.com/sebrandon1/openshift-preflight/certification/runtime"
 
 	"gotest.tools/v3/assert"
 )

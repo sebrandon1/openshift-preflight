@@ -5,9 +5,9 @@ All pull requests will be subject to the tests described below.
 ## Unit
 
 Unit tests are executed using [GitHub
-Actions](https://github.com/redhat-openshift-ecosystem/openshift-preflight/actions).
+Actions](https://github.com/sebrandon1/openshift-preflight/actions).
 
-Our workflows can be found [here](https://github.com/redhat-openshift-ecosystem/openshift-preflight/tree/main/.github/workflows)
+Our workflows can be found [here](https://github.com/sebrandon1/openshift-preflight/tree/main/.github/workflows)
 
 ## End-to-End
 

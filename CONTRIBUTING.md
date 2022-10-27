@@ -76,6 +76,6 @@ The first line is the subject and should be no longer than 70 characters, the se
 
 [operator_ecosystem_contact]: https://groups.google.com/g/red-hat-operator-ecosystem
 [operator_ecosystem_org]: https://github.com/redhat-openshift-ecosystem
-[developer_docs]: https://github.com/redhat-openshift-ecosystem/openshift-preflight/tree/main/docs/dev
+[developer_docs]: https://github.com/sebrandon1/openshift-preflight/tree/main/docs/dev
 [reporting_issues]: https://sdk.operatorframework.io/docs/contribution-guidelines/reporting-issues/
 [golang_style_doc]: https://github.com/golang/go/wiki/CodeReviewComments

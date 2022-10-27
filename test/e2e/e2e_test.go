@@ -4,10 +4,10 @@ import (
 	"context"
 	"os"
 
-	"github.com/redhat-openshift-ecosystem/openshift-preflight/certification/artifacts"
-	"github.com/redhat-openshift-ecosystem/openshift-preflight/certification/engine"
-	"github.com/redhat-openshift-ecosystem/openshift-preflight/certification/policy"
-	"github.com/redhat-openshift-ecosystem/openshift-preflight/certification/runtime"
+	"github.com/sebrandon1/openshift-preflight/certification/artifacts"
+	"github.com/sebrandon1/openshift-preflight/certification/engine"
+	"github.com/sebrandon1/openshift-preflight/certification/policy"
+	"github.com/sebrandon1/openshift-preflight/certification/runtime"
 
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"

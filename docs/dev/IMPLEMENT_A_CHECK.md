@@ -7,7 +7,7 @@ be considered certifiable by Red Hat.
 All checks must fulfill the `Check` interface to be executed against a given
 bundle or container image. For full documentation on what each method that must
 be implemented to fulfill the check interface, please refer to the [package
-documentation](https://pkg.go.dev/github.com/redhat-openshift-ecosystem/openshift-preflight/certification).
+documentation](https://pkg.go.dev/github.com/sebrandon1/openshift-preflight/certification).
 
 ## Defining a new check
 

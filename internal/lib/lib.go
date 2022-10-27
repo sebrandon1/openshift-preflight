@@ -10,12 +10,12 @@ import (
 
 	log "github.com/sirupsen/logrus"
 
-	"github.com/redhat-openshift-ecosystem/openshift-preflight/certification"
-	"github.com/redhat-openshift-ecosystem/openshift-preflight/certification/artifacts"
-	"github.com/redhat-openshift-ecosystem/openshift-preflight/certification/engine"
-	"github.com/redhat-openshift-ecosystem/openshift-preflight/certification/formatters"
-	"github.com/redhat-openshift-ecosystem/openshift-preflight/certification/policy"
-	"github.com/redhat-openshift-ecosystem/openshift-preflight/certification/runtime"
+	"github.com/sebrandon1/openshift-preflight/certification"
+	"github.com/sebrandon1/openshift-preflight/certification/artifacts"
+	"github.com/sebrandon1/openshift-preflight/certification/engine"
+	"github.com/sebrandon1/openshift-preflight/certification/formatters"
+	"github.com/sebrandon1/openshift-preflight/certification/policy"
+	"github.com/sebrandon1/openshift-preflight/certification/runtime"
 )
 
 // CheckContainerRunner contains all of the components necessary to run checkContainer.

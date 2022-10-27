@@ -3,8 +3,8 @@ package cmd
 import (
 	"os"
 
-	"github.com/redhat-openshift-ecosystem/openshift-preflight/certification/artifacts"
-	"github.com/redhat-openshift-ecosystem/openshift-preflight/internal/lib"
+	"github.com/sebrandon1/openshift-preflight/certification/artifacts"
+	"github.com/sebrandon1/openshift-preflight/internal/lib"
 
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
